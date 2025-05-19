@@ -14,6 +14,21 @@
     exit; // Prevent direct access
 }
 
+if ( ! function_exists( 'is_plugin_active' ) ) {
+    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+
+add_action('admin_init', function() {
+    if ( !is_plugin_active('appetiser-common-assets/appetiser-common-assets.php') ) {
+        deactivate_plugins(plugin_basename(__FILE__));
+        add_action('admin_notices', function() {
+            $plugin_data = get_plugin_data(__FILE__);
+            $plugin_name = $plugin_data['Name'] ?? 'This plugin';
+            echo '<div class="notice notice-error"><p><strong>Error:</strong> <code>' . esc_html($plugin_name) . '</code> requires <code>appetiser-common-assets</code> to be installed and active.</p></div>';
+        });
+    }
+});
+
 // Include admin class
 require_once plugin_dir_path(__FILE__) . 'admin/app-lm-admin.php';
 require_once plugin_dir_path(__FILE__) . 'public/app-lm-public.php';
